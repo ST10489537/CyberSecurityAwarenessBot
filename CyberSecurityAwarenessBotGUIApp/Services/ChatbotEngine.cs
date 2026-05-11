@@ -55,7 +55,38 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                     "Do not share sensitive personal information online.",
                     "Enable two-factor authentication whenever possible."
                 }
-            }
+
+            },
+
+            {
+    "browsing",
+    new List<string>
+    {
+        "Only enter personal information on secure HTTPS websites.",
+        "Avoid downloading files from unknown websites.",
+        "Keep your browser updated for better security and protection."
+    }
+},
+            {
+    "2fa",
+    new List<string>
+    {
+        "Two-factor authentication adds an extra layer of protection to your accounts.",
+        "2FA helps protect your account even if your password gets stolen.",
+        "Using an authentication app is safer than SMS verification where possible."
+    }
+},
+
+            {
+    "malware",
+    new List<string>
+    {
+        "Install trusted antivirus software to help detect malware threats.",
+        "Avoid downloading cracked or pirated software because it may contain malware.",
+        "Keep your operating system updated to reduce malware vulnerabilities."
+    }
+}
+
         };
 
         // Generates chatbot responses.
