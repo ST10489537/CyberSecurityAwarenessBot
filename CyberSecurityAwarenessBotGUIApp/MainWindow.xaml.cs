@@ -1,10 +1,14 @@
-﻿using System.Media;
+﻿using CyberSecurityAwarenessBotGUIApp.Services;
+using System.Media;
 using System.Windows;
 
 namespace CyberSecurityAwarenessBotGUIApp
 {
     public partial class MainWindow : Window
     {
+        // Creates one chatbot engine for the whole chat session.
+        private readonly ChatbotEngine _chatbotEngine = new ChatbotEngine();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -14,7 +18,7 @@ namespace CyberSecurityAwarenessBotGUIApp
             player.Play();
 
             // Shows the first chatbot message.
-            ChatDisplay.Text = "Bot: Hello! Welcome to the Cybersecurity Awareness Bot. Please type your name to begin.";
+            ChatDisplay.Text = "Bot: Hello! Welcome to the Cybersecurity Awareness Bot. Please type 'My name is ...' to begin.";
         }
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
@@ -22,26 +26,25 @@ namespace CyberSecurityAwarenessBotGUIApp
             // Gets what the user typed.
             string userInput = UserInputTextBox.Text.Trim();
 
-            // Checks for empty input.
-            if (string.IsNullOrWhiteSpace(userInput))
-            {
-                ChatDisplay.Text += "\n\nBot: Please type something so I can assist you.";
-                return;
-            }
-
             // Displays the user's message.
             ChatDisplay.Text += "\n\nYou: " + userInput;
 
-            // Temporary response for now.
-            ChatDisplay.Text += "\n\nBot: Thank you. I will respond to cybersecurity questions about passwords, phishing, scams, privacy, and safe browsing.";
+            // Sends the user input to ChatbotEngine and receives the bot response.
+            string botResponse = _chatbotEngine.GetResponse(userInput);
 
-            // Clears the textbox.
+            // Displays the chatbot response.
+            ChatDisplay.Text += "\n\nBot: " + botResponse;
+
+            // Clears the input box after sending.
             UserInputTextBox.Clear();
+
+            // Places the cursor back in the textbox.
+            UserInputTextBox.Focus();
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            // Clears the chat display.
+            // Clears the chat window.
             ChatDisplay.Text = "Bot: Chat cleared. You can continue asking cybersecurity questions.";
         }
     }
