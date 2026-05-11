@@ -1,12 +1,12 @@
 ﻿using CyberSecurityAwarenessBotGUIApp.Services;
 using System.Media;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CyberSecurityAwarenessBotGUIApp
 {
     public partial class MainWindow : Window
     {
-        // Creates one chatbot engine for the whole chat session.
         private readonly ChatbotEngine _chatbotEngine = new ChatbotEngine();
 
         public MainWindow()
@@ -40,6 +40,15 @@ namespace CyberSecurityAwarenessBotGUIApp
 
             // Places the cursor back in the textbox.
             UserInputTextBox.Focus();
+        }
+
+        private void UserInputTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Sends the message when the Enter key is pressed.
+            if (e.Key == Key.Enter)
+            {
+                SendButton_Click(sender, e);
+            }
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)

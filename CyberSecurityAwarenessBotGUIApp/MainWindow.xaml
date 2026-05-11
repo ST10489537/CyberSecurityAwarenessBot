@@ -80,11 +80,12 @@
 
             <!-- User Input -->
             <TextBox x:Name="UserInputTextBox"
-                     Grid.Column="0"
-                     Height="40"
-                     FontSize="15"
-                     Padding="10"
-                     VerticalContentAlignment="Center"/>
+         Grid.Column="0"
+         Height="40"
+         FontSize="15"
+         Padding="10"
+         VerticalContentAlignment="Center"
+         KeyDown="UserInputTextBox_KeyDown"/>
 
             <!-- Send Button -->
             <Button x:Name="SendButton"
