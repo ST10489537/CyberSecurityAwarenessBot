@@ -1,3 +1,4 @@
 <Solution>
-  <Project Path="CyberSecurityAwarenessBot/CyberSecurityAwarenessBot.csproj" />
+  <Project Path="../../../../../../source/repos/CyberSecurityAwarenessBot/CyberSecurityAwarenessBot/CyberSecurityAwarenessBot.csproj" />
+  <Project Path="../../../../../../source/repos/CyberSecurityAwarenessBot/CyberSecurityAwarenessBotGUI/CyberSecurityAwarenessBotGUI.csproj" Id="0f2cee05-40c7-469b-aa93-564de135c1f4" />
 </Solution>
