@@ -1,12 +1,111 @@
 ﻿<Window x:Class="CyberSecurityAwarenessBotGUIApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CyberSecurityAwarenessBotGUIApp"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Cybersecurity Awareness Bot"
+        Height="650"
+        Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#EAF2FB">
+
+    <Grid Margin="20">
+
+        <!-- Row Structure -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Background="#003366"
+                CornerRadius="12"
+                Padding="15"
+                Margin="0,0,0,15">
+
+            <StackPanel>
+
+                <!-- Main Title -->
+                <TextBlock Text="CYBERSECURITY AWARENESS BOT"
+                           Foreground="White"
+                           FontSize="26"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"/>
+
+                <!-- Subtitle -->
+                <TextBlock Text="Helping South African citizens stay safe online"
+                           Foreground="#DDEEFF"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Margin="0,5,0,0"/>
+
+                <!-- ASCII Style Banner -->
+                <TextBlock Text="╔════════════════════════════════╗&#x0a;║ 🔐 SECURITY • PRIVACY • SAFETY ║&#x0a;╚════════════════════════════════╝"
+                           Foreground="White"
+                           FontFamily="Consolas"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Chat Display Area -->
+        <Border Grid.Row="1"
+                Background="White"
+                CornerRadius="12"
+                Padding="15"
+                BorderBrush="#B0C4DE"
+                BorderThickness="1">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                <!-- Chat messages appear here -->
+                <TextBlock x:Name="ChatDisplay"
+                           TextWrapping="Wrap"
+                           FontSize="15"
+                           FontFamily="Segoe UI"/>
+
+            </ScrollViewer>
+        </Border>
+
+        <!-- Bottom Input Area -->
+        <Grid Grid.Row="2"
+              Margin="0,15,0,0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="120"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- User Input -->
+            <TextBox x:Name="UserInputTextBox"
+                     Grid.Column="0"
+                     Height="40"
+                     FontSize="15"
+                     Padding="10"
+                     VerticalContentAlignment="Center"/>
+
+            <!-- Send Button -->
+            <Button x:Name="SendButton"
+                    Grid.Column="1"
+                    Content="Send"
+                    Margin="10,0,0,0"
+                    Background="#003366"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Click="SendButton_Click"/>
+
+            <!-- Clear Button -->
+            <Button x:Name="ClearButton"
+                    Grid.Column="2"
+                    Content="Clear"
+                    Margin="10,0,0,0"
+                    Background="#607D8B"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    Click="ClearButton_Click"/>
+        </Grid>
 
     </Grid>
 </Window>
