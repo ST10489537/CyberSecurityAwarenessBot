@@ -4,27 +4,23 @@ using System.Text;
 
 namespace CyberSecurityAwarenessBotGUIApp.Services
 {
-    // Detects simple emotions from the user's message.
+    // Detects basic user sentiment from their message
     public class SentimentDetector
     {
+        // Returns the detected sentiment: "worried", "frustrated", "curious", or "neutral"
         public string Detect(string input)
         {
-            // Converts input to lowercase.
             input = input.ToLower();
 
-            // Detects worried emotions.
-            if (input.Contains("worried") || input.Contains("scared"))
+            if (input.Contains("worried") || input.Contains("scared") || input.Contains("afraid") || input.Contains("nervous"))
                 return "worried";
 
-            // Detects frustration.
-            if (input.Contains("frustrated") || input.Contains("angry"))
+            if (input.Contains("frustrated") || input.Contains("angry") || input.Contains("annoyed") || input.Contains("hate"))
                 return "frustrated";
 
-            // Detects curiosity.
-            if (input.Contains("curious") || input.Contains("interested"))
+            if (input.Contains("curious") || input.Contains("interesting") || input.Contains("want to know") || input.Contains("tell me more"))
                 return "curious";
 
-            // Default emotion.
             return "neutral";
         }
     }

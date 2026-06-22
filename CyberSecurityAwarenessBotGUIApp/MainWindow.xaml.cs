@@ -1,4 +1,7 @@
-﻿using CyberSecurityAwarenessBotGUIApp.Quiz;
+﻿using CyberSecurityAwarenessBotGUIApp.Database;
+using CyberSecurityAwarenessBotGUIApp.Logs;
+using CyberSecurityAwarenessBotGUIApp.Models;
+using CyberSecurityAwarenessBotGUIApp.Quiz;
 using CyberSecurityAwarenessBotGUIApp.Services;
 using System.Media;
 using System.Windows;
@@ -8,129 +11,210 @@ namespace CyberSecurityAwarenessBotGUIApp
 {
     public partial class MainWindow : Window
     {
-        // Quiz service
-        private QuizService _quizService;
+        // ── Services ──────────────────────────────────────────────
+        private readonly ChatbotEngine _chatbotEngine = new();
+        private readonly QuizService _quizService = new();
+        private readonly TaskDatabaseService _taskDbService = new();
+        private readonly ActivityLogService _activityLog = new();
 
-        // Current question index
+        // ── Quiz state ────────────────────────────────────────────
         private int _currentQuestion = 0;
-
-        // User score
         private int _quizScore = 0;
-        private readonly ChatbotEngine _chatbotEngine = new ChatbotEngine();
 
+        // ── Constructor ───────────────────────────────────────────
         public MainWindow()
         {
             InitializeComponent();
 
-            _quizService = new QuizService();
+            // Initialise the MySQL database (creates table if needed)
+            DatabaseService.InitialiseDatabase();
 
+            // Load the first quiz question
             LoadQuestion();
 
+            // Play the welcome voice greeting
+            try
+            {
+                SoundPlayer player = new SoundPlayer("Assets/Greeting.wav.wav");
+                player.Play();
+            }
+            catch
+            {
+                // Greeting file missing — continue without audio
+            }
 
-            // Plays the voice greeting when the GUI opens.
-            SoundPlayer player = new SoundPlayer("Assets/Greeting.wav.wav");
-            player.Play();
+            // Show the initial bot message in the chat tab
+            ChatDisplay.Text = "Bot: Hello! Welcome to the Cybersecurity Awareness Bot.\nPlease type 'My name is ...' to begin.";
 
-            // Shows the first chatbot message.
-            ChatDisplay.Text = "Bot: Hello! Welcome to the Cybersecurity Awareness Bot. Please type 'My name is ...' to begin.";
+            // Log the startup action
+            _activityLog.Log("Application started.");
         }
+
+        // ── CHAT TAB ──────────────────────────────────────────────
 
         private void SendButton_Click(object sender, RoutedEventArgs e)
         {
-            // Gets what the user typed.
             string userInput = UserInputTextBox.Text.Trim();
+            if (string.IsNullOrEmpty(userInput)) return;
 
-            // Displays the user's message.
-            ChatDisplay.Text += "\n\nYou: " + userInput;
+            // Display the user's message
+            ChatDisplay.Text += $"\n\nYou: {userInput}";
 
-            // Sends the user input to ChatbotEngine and receives the bot response.
+            // Get the bot's response
             string botResponse = _chatbotEngine.GetResponse(userInput);
 
-            // Displays the chatbot response.
-            ChatDisplay.Text += "\n\nBot: " + botResponse;
+            // Handle special signal to show activity log inline
+            if (botResponse == "__SHOW_LOG__")
+            {
+                var logs = _activityLog.GetRecentLogs();
+                botResponse = "Here are your recent actions:\n" + string.Join("\n", logs);
+            }
 
-            // Clears the input box after sending.
+            // Display the bot's response
+            ChatDisplay.Text += $"\n\nBot: {botResponse}";
+
+            // Log the chat interaction
+            _activityLog.Log($"Chat: User asked about '{userInput}'.");
+
+            // Clear the input box and refocus
             UserInputTextBox.Clear();
-
-            // Places the cursor back in the textbox.
             UserInputTextBox.Focus();
         }
 
         private void UserInputTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            // Sends the message when the Enter key is pressed.
+            // Allow sending messages by pressing Enter
             if (e.Key == Key.Enter)
-            {
                 SendButton_Click(sender, e);
-            }
         }
 
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
-            // Clears the chat window.
             ChatDisplay.Text = "Bot: Chat cleared. You can continue asking cybersecurity questions.";
+            _activityLog.Log("Chat window cleared.");
         }
 
-        private void LoadQuestion()
+        // ── TASK ASSISTANT TAB ────────────────────────────────────
+
+        private void AddTaskButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentQuestion >= _quizService.Questions.Count)
+            string title = TaskTitleBox.Text.Trim();
+            string description = TaskDescriptionBox.Text.Trim();
+            string reminder = ReminderDatePicker.SelectedDate?.ToString("yyyy-MM-dd") ?? "";
+
+            // Validate that a title was entered
+            if (string.IsNullOrEmpty(title))
             {
-                QuizQuestionText.Text =
-                    $"Quiz Complete! Final Score: {_quizScore}/{_quizService.Questions.Count}";
-
-                QuizAnswers.Items.Clear();
-
+                MessageBox.Show("Please enter a task title.", "Validation", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var question =
-                _quizService.Questions[_currentQuestion];
+            // Build the task object and save it to the database
+            var task = new TaskItem
+            {
+                Title = title,
+                Description = string.IsNullOrEmpty(description) ? "No description provided." : description,
+                ReminderDate = string.IsNullOrEmpty(reminder) ? null : reminder,
+                IsCompleted = false
+            };
 
-            QuizQuestionText.Text =
-                question.Question;
+            _taskDbService.AddTask(task);
 
+            // Log the action
+            string logMsg = string.IsNullOrEmpty(reminder)
+                ? $"Task added: '{title}' (no reminder)."
+                : $"Task added: '{title}' with reminder on {reminder}.";
+            _activityLog.Log(logMsg);
+
+            // Refresh the task grid and clear inputs
+            RefreshTaskGrid();
+            TaskTitleBox.Clear();
+            TaskDescriptionBox.Clear();
+            ReminderDatePicker.SelectedDate = null;
+
+            MessageBox.Show($"Task '{title}' added successfully!", "Task Added", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        // Loads all tasks from the DB and binds them to the DataGrid
+        private void RefreshTaskGrid()
+        {
+            TaskGrid.ItemsSource = null;
+            TaskGrid.ItemsSource = _taskDbService.GetAllTasks();
+        }
+
+        // ── QUIZ TAB ──────────────────────────────────────────────
+
+        private void LoadQuestion()
+        {
+            // Check if all questions have been answered
+            if (_currentQuestion >= _quizService.Questions.Count)
+            {
+                string result = _quizScore >= 8 ? "🏆 Excellent! You're a cybersecurity pro!" :
+                                _quizScore >= 5 ? "👍 Good effort! Keep learning to stay safe." :
+                                                  "📚 Keep studying — cybersecurity knowledge saves you!";
+
+                QuizQuestionText.Text = $"Quiz Complete!\nFinal Score: {_quizScore}/{_quizService.Questions.Count}\n\n{result}";
+                QuizAnswers.Items.Clear();
+                _activityLog.Log($"Quiz completed. Score: {_quizScore}/{_quizService.Questions.Count}.");
+                return;
+            }
+
+            // Display the current question and its options
+            var question = _quizService.Questions[_currentQuestion];
+            QuizQuestionText.Text = $"Q{_currentQuestion + 1}: {question.Question}";
             QuizAnswers.Items.Clear();
 
             foreach (string option in question.Options)
-            {
                 QuizAnswers.Items.Add(option);
-            }
 
             QuizFeedback.Text = "";
         }
 
-    
-private void SubmitAnswer_Click(object sender, RoutedEventArgs e)
+        private void SubmitAnswer_Click(object sender, RoutedEventArgs e)
         {
             if (QuizAnswers.SelectedIndex == -1)
             {
-                QuizFeedback.Text =
-                    "Please select an answer.";
-
+                QuizFeedback.Text = "Please select an answer before submitting.";
                 return;
             }
 
-            var question =
-                _quizService.Questions[_currentQuestion];
+            var question = _quizService.Questions[_currentQuestion];
 
-            if (QuizAnswers.SelectedIndex ==
-                question.CorrectAnswer)
+            // Check if the selected answer is correct
+            if (QuizAnswers.SelectedIndex == question.CorrectAnswer)
             {
                 _quizScore++;
-
-                QuizFeedback.Text =
-                    "Correct! " + question.Explanation;
+                QuizFeedback.Text = "✅ Correct! " + question.Explanation;
             }
             else
             {
-                QuizFeedback.Text =
-                    "Incorrect. " + question.Explanation;
+                QuizFeedback.Text = "❌ Incorrect. " + question.Explanation;
             }
 
-            _currentQuestion++;
+            // Log quiz answer
+            _activityLog.Log($"Quiz Q{_currentQuestion + 1} answered.");
 
+            _currentQuestion++;
             LoadQuestion();
         }
 
+        // ── ACTIVITY LOG TAB ─────────────────────────────────────
+
+        private void RefreshLog_Click(object sender, RoutedEventArgs e)
+        {
+            // Clear and reload the activity log list
+            ActivityLogList.Items.Clear();
+
+            var logs = _activityLog.GetRecentLogs(10);
+
+            if (logs.Count == 0)
+            {
+                ActivityLogList.Items.Add("No activity recorded yet.");
+                return;
+            }
+
+            foreach (string entry in logs)
+                ActivityLogList.Items.Add(entry);
+        }
     }
 }

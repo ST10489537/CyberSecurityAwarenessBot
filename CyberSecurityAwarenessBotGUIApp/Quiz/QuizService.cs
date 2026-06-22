@@ -4,9 +4,10 @@ using System.Text;
 
 namespace CyberSecurityAwarenessBotGUIApp.Quiz
 {
+    // Loads and provides all quiz questions for the cybersecurity quiz
     public class QuizService
     {
-        public List<QuizQuestion> Questions { get; set; }
+        public List<QuizQuestion> Questions { get; private set; }
 
         public QuizService()
         {
@@ -14,170 +15,80 @@ namespace CyberSecurityAwarenessBotGUIApp.Quiz
             {
                 new QuizQuestion
                 {
-                    Question = "What is phishing?",
-                    Options = new[]
-                    {
-                        "A type of fishing",
-                        "A scam to steal information",
-                        "A computer game",
-                        "A password manager"
-                    },
-                    CorrectAnswer = 1,
-                    Explanation = "Phishing is a scam designed to steal sensitive information."
+                    Question = "What should you do if you receive an email asking for your password?",
+                    Options = new List<string> { "A) Reply with your password", "B) Delete the email", "C) Report it as phishing", "D) Ignore it" },
+                    CorrectAnswer = 2,
+                    Explanation = "Always report phishing emails to help protect others."
                 },
-
                 new QuizQuestion
                 {
-                    Question = "Which password is strongest?",
-                    Options = new[]
-                    {
-                        "password123",
-                        "12345678",
-                        "P@ssw0rd!",
-                        "T#9kL@7zQ!2"
-                    },
+                    Question = "Which of the following is the strongest password?",
+                    Options = new List<string> { "A) password123", "B) John1990", "C) P@ssw0rd!", "D) Xk#9mL!2vQ$" },
                     CorrectAnswer = 3,
-                    Explanation = "Long, complex passwords are more secure."
+                    Explanation = "Long passwords with mixed characters are hardest to crack."
                 },
-
                 new QuizQuestion
                 {
                     Question = "What does 2FA stand for?",
-                    Options = new[]
-                    {
-                        "Two-Factor Authentication",
-                        "Two File Access",
-                        "Fast Access",
-                        "Two Form Approval"
-                    },
+                    Options = new List<string> { "A) Two-Factor Authentication", "B) Two-File Access", "C) Trusted Firewall Application", "D) None of the above" },
                     CorrectAnswer = 0,
-                    Explanation = "2FA adds an extra layer of security."
+                    Explanation = "2FA adds an extra layer of security beyond just a password."
                 },
-
                 new QuizQuestion
                 {
-                    Question = "What should you do with suspicious emails?",
-                    Options = new[]
-                    {
-                        "Open attachments",
-                        "Reply immediately",
-                        "Report or delete them",
-                        "Forward them"
-                    },
+                    Question = "True or False: Public Wi-Fi is safe to use for online banking.",
+                    Options = new List<string> { "A) True", "B) False" },
+                    CorrectAnswer = 1,
+                    Explanation = "Public Wi-Fi can be intercepted. Use a VPN or mobile data for banking."
+                },
+                new QuizQuestion
+                {
+                    Question = "What is phishing?",
+                    Options = new List<string> { "A) A type of malware", "B) A trick to steal personal info via fake messages", "C) A firewall technique", "D) Safe browsing software" },
+                    CorrectAnswer = 1,
+                    Explanation = "Phishing uses deceptive emails/sites to steal your credentials."
+                },
+                new QuizQuestion
+                {
+                    Question = "How often should you update your passwords?",
+                    Options = new List<string> { "A) Never", "B) Every 5 years", "C) Every 3–6 months", "D) Only when hacked" },
                     CorrectAnswer = 2,
-                    Explanation = "Suspicious emails should be reported or deleted."
+                    Explanation = "Regular password changes reduce the risk of unauthorised access."
                 },
-
                 new QuizQuestion
                 {
-                    Question = "What is malware?",
-                    Options = new[]
-                    {
-                        "Security software",
-                        "Malicious software",
-                        "Email software",
-                        "A browser"
-                    },
+                    Question = "What should you check before clicking a link in an email?",
+                    Options = new List<string> { "A) The email font", "B) The sender's address and URL", "C) The email subject only", "D) Nothing, just click" },
                     CorrectAnswer = 1,
-                    Explanation = "Malware is software designed to damage systems."
+                    Explanation = "Always verify sender and hover over links before clicking."
                 },
-
                 new QuizQuestion
                 {
-                    Question = "Is public Wi-Fi always safe?",
-                    Options = new[]
-                    {
-                        "Yes",
-                        "No",
-                        "Only at airports",
-                        "Only with Windows"
-                    },
+                    Question = "True or False: Antivirus software eliminates all cyber threats.",
+                    Options = new List<string> { "A) True", "B) False" },
                     CorrectAnswer = 1,
-                    Explanation = "Public Wi-Fi can expose your data."
+                    Explanation = "Antivirus helps but cannot catch every threat — good habits matter too."
                 },
-
                 new QuizQuestion
                 {
-                    Question = "What is social engineering?",
-                    Options = new[]
-                    {
-                        "Building websites",
-                        "Manipulating people to reveal information",
-                        "Coding software",
-                        "Computer repair"
-                    },
+                    Question = "What is social engineering in cybersecurity?",
+                    Options = new List<string> { "A) Building secure networks", "B) Manipulating people to reveal confidential info", "C) Installing firewalls", "D) Encrypting data" },
                     CorrectAnswer = 1,
-                    Explanation = "Social engineering exploits human trust."
+                    Explanation = "Social engineering exploits human psychology, not technical vulnerabilities."
                 },
-
                 new QuizQuestion
                 {
-                    Question = "Why should software be updated?",
-                    Options = new[]
-                    {
-                        "For security patches",
-                        "To slow down the PC",
-                        "To remove files",
-                        "To change passwords"
-                    },
-                    CorrectAnswer = 0,
-                    Explanation = "Updates often fix security vulnerabilities."
+                    Question = "Which action best protects your online accounts?",
+                    Options = new List<string> { "A) Using the same password everywhere", "B) Sharing passwords with trusted friends", "C) Enabling 2FA and using unique passwords", "D) Writing passwords on sticky notes" },
+                    CorrectAnswer = 2,
+                    Explanation = "Unique passwords + 2FA is the gold standard for account security."
                 },
-
                 new QuizQuestion
                 {
                     Question = "What is ransomware?",
-                    Options = new[]
-                    {
-                        "A backup tool",
-                        "A type of malware that locks files",
-                        "An antivirus",
-                        "A firewall"
-                    },
+                    Options = new List<string> { "A) Software that speeds up your PC", "B) Malware that encrypts files and demands payment", "C) A type of antivirus", "D) A browser extension" },
                     CorrectAnswer = 1,
-                    Explanation = "Ransomware encrypts files and demands payment."
-                },
-
-                new QuizQuestion
-                {
-                    Question = "Why are backups important?",
-                    Options = new[]
-                    {
-                        "To recover lost data",
-                        "To increase viruses",
-                        "To reduce storage",
-                        "To disable software"
-                    },
-                    CorrectAnswer = 0,
-                    Explanation = "Backups help restore important information."
-                },
-
-                new QuizQuestion
-                {
-                    Question = "What is identity theft?",
-                    Options = new[]
-                    {
-                        "Stealing hardware",
-                        "Using someone's personal information fraudulently",
-                        "Deleting files",
-                        "Installing updates"
-                    },
-                    CorrectAnswer = 1,
-                    Explanation = "Identity theft involves misuse of personal information."
-                },
-
-                new QuizQuestion
-                {
-                    Question = "What should you do before clicking a link?",
-                    Options = new[]
-                    {
-                        "Click immediately",
-                        "Verify the source",
-                        "Share it",
-                        "Ignore it"
-                    },
-                    CorrectAnswer = 1,
-                    Explanation = "Always verify links before clicking."
+                    Explanation = "Ransomware locks your data and demands a ransom to restore it."
                 }
             };
         }
