@@ -21,7 +21,6 @@
   <ItemGroup>
     <Folder Include="Database\" />
     <Folder Include="Logs\" />
-    <Folder Include="Quiz\" />
   </ItemGroup>
 
   <ItemGroup>
