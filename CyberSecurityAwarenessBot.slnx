@@ -1,3 +1,6 @@
 <Solution>
-  <Project Path="CyberSecurityAwarenessBot/CyberSecurityAwarenessBot.csproj" />
+  <Folder Name="/Solution Items/">
+    <File Path="CyberSecurityAwarenessBot/CyberSecurityAwarenessBot.csproj" />
+  </Folder>
+  <Project Path="CyberSecurityAwarenessBotGUIApp/CyberSecurityAwarenessBotGUIApp.csproj" Id="a1f85d33-6e52-4023-9ffb-63808b8713d3" />
 </Solution>
