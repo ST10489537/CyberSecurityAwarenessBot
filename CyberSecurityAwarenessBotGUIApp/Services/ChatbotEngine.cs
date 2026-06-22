@@ -4,16 +4,23 @@ using System.Collections.Generic;
 
 namespace CyberSecurityAwarenessBotGUIApp.Services
 {
-    // Main chatbot response engine.
+    // Main chatbot engine responsible for processing user input
+    // and generating cybersecurity awareness responses.
     public class ChatbotEngine
     {
+        // Used for selecting random responses.
         private readonly Random _random = new Random();
 
+        // Stores user information and conversation memory.
         private readonly ChatMemory _memory = new ChatMemory();
 
-        private readonly SentimentDetector _sentimentDetector = new SentimentDetector();
+        // Detects the user's sentiment.
+        private readonly SentimentDetector _sentimentDetector =
+            new SentimentDetector();
 
-        // Cybersecurity responses.
+        // Cybersecurity knowledge base.
+        // Each topic contains multiple responses so that
+        // the chatbot can provide varied answers.
         private readonly Dictionary<string, List<string>> _responses =
             new Dictionary<string, List<string>>
         {
@@ -21,9 +28,9 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 "password",
                 new List<string>
                 {
-                    "Use strong passwords with numbers, symbols, and uppercase letters.",
-                    "Avoid using your birthday or name in passwords.",
-                    "Use a password manager for safer password storage."
+                    "Use strong passwords with numbers, symbols and uppercase letters.",
+                    "Avoid using birthdays or names in passwords.",
+                    "Use a password manager to store passwords securely."
                 }
             },
 
@@ -33,7 +40,7 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 {
                     "Do not click suspicious email links.",
                     "Always verify the sender before opening attachments.",
-                    "Phishing attacks often create panic or urgency."
+                    "Phishing attacks often create urgency or panic."
                 }
             },
 
@@ -41,9 +48,9 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 "scam",
                 new List<string>
                 {
-                    "Be careful of online prize scams.",
-                    "Never share banking details with unknown people.",
-                    "If something seems too good to be true, it probably is."
+                    "Be cautious of online prize scams.",
+                    "Never share banking information with strangers.",
+                    "If something sounds too good to be true, it probably is."
                 }
             },
 
@@ -52,64 +59,110 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 new List<string>
                 {
                     "Review your social media privacy settings regularly.",
-                    "Do not share sensitive personal information online.",
+                    "Avoid sharing sensitive personal information online.",
                     "Enable two-factor authentication whenever possible."
                 }
-
             },
 
             {
-    "browsing",
-    new List<string>
-    {
-        "Only enter personal information on secure HTTPS websites.",
-        "Avoid downloading files from unknown websites.",
-        "Keep your browser updated for better security and protection."
-    }
-},
-            {
-    "2fa",
-    new List<string>
-    {
-        "Two-factor authentication adds an extra layer of protection to your accounts.",
-        "2FA helps protect your account even if your password gets stolen.",
-        "Using an authentication app is safer than SMS verification where possible."
-    }
-},
+                "browsing",
+                new List<string>
+                {
+                    "Only enter personal information on HTTPS websites.",
+                    "Avoid downloading files from unknown websites.",
+                    "Keep your browser updated for better security."
+                }
+            },
 
             {
-    "malware",
-    new List<string>
-    {
-        "Install trusted antivirus software to help detect malware threats.",
-        "Avoid downloading cracked or pirated software because it may contain malware.",
-        "Keep your operating system updated to reduce malware vulnerabilities."
-    }
-}
+                "2fa",
+                new List<string>
+                {
+                    "Two-factor authentication adds an extra layer of security.",
+                    "2FA helps protect accounts even if passwords are stolen.",
+                    "Authentication apps are generally safer than SMS verification."
+                }
+            },
 
+            {
+                "malware",
+                new List<string>
+                {
+                    "Install trusted antivirus software.",
+                    "Avoid downloading pirated software.",
+                    "Keep your operating system updated."
+                }
+            },
+
+            {
+                "vpn",
+                new List<string>
+                {
+                    "A VPN encrypts your internet traffic.",
+                    "VPNs improve privacy when using public networks.",
+                    "Choose a trusted VPN provider."
+                }
+            },
+
+            {
+                "ransomware",
+                new List<string>
+                {
+                    "Ransomware locks files and demands payment.",
+                    "Regular backups help protect against ransomware.",
+                    "Never download files from untrusted sources."
+                }
+            },
+
+            {
+                "social engineering",
+                new List<string>
+                {
+                    "Social engineering tricks people into revealing information.",
+                    "Attackers often impersonate trusted individuals.",
+                    "Always verify requests for sensitive information."
+                }
+            },
+
+            {
+                "wifi",
+                new List<string>
+                {
+                    "Public Wi-Fi networks can expose your information.",
+                    "Avoid online banking on public Wi-Fi.",
+                    "Use a VPN when connecting to public networks."
+                }
+            }
         };
 
-        // Generates chatbot responses.
+        // Main method that processes user input
+        // and returns a chatbot response.
         public string GetResponse(string userInput)
         {
-            // Prevents empty messages.
+            // Prevent empty messages from being processed.
             if (string.IsNullOrWhiteSpace(userInput))
                 return "Please type a message first.";
 
             string input = userInput.ToLower();
 
-            string sentiment = _sentimentDetector.Detect(input);
+            // Detect the user's sentiment.
+            string sentiment =
+                _sentimentDetector.Detect(input);
 
-            // Stores user's name.
+            // Stores the user's name in memory.
             if (input.StartsWith("my name is"))
             {
                 _memory.UserName =
-                    userInput.Replace("my name is", "", StringComparison.OrdinalIgnoreCase).Trim();
+                    userInput.Replace(
+                        "my name is",
+                        "",
+                        StringComparison.OrdinalIgnoreCase)
+                    .Trim();
 
                 return $"Nice to meet you, {_memory.UserName}.";
             }
 
-            // Remembers favourite topic.
+            // Stores the user's favourite cybersecurity topic.
             if (input.Contains("interested in"))
             {
                 foreach (string topic in _responses.Keys)
@@ -124,8 +177,10 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 }
             }
 
-            // Follow-up conversation.
-            if (input.Contains("tell me more") || input.Contains("another tip"))
+            // Allows users to ask for more information
+            // about the previously discussed topic.
+            if (input.Contains("tell me more") ||
+                input.Contains("another tip"))
             {
                 if (!string.IsNullOrEmpty(_memory.LastTopic))
                     return GetRandomResponse(_memory.LastTopic);
@@ -133,16 +188,56 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 return "Please first ask me about a cybersecurity topic.";
             }
 
-            // Keyword recognition.
+            // =====================================================
+            // PART 3 NLP (Natural Language Processing)
+            // Handles different user commands and intentions.
+            // =====================================================
+
+            // Detect task-related requests.
+            if (input.Contains("task") ||
+                input.Contains("add task") ||
+                input.Contains("create task") ||
+                input.Contains("new task"))
+            {
+                return "Please open the Task Assistant tab to manage your tasks.";
+            }
+
+            // Detect quiz-related requests.
+            if (input.Contains("quiz") ||
+                input.Contains("start quiz") ||
+                input.Contains("cyber quiz"))
+            {
+                return "Please open the Cyber Quiz tab to begin the quiz.";
+            }
+
+            // Detect reminder-related requests.
+            if (input.Contains("remind me") ||
+                input.Contains("set reminder") ||
+                input.Contains("reminder"))
+            {
+                return "Please use the Task Assistant tab to create a reminder.";
+            }
+
+            // Detect activity log requests.
+            if (input.Contains("activity log") ||
+                input.Contains("show log"))
+            {
+                return "Please open the Activity Log tab to view recent actions.";
+            }
+
+            // Searches for cybersecurity keywords
+            // contained in the user's message.
             foreach (string topic in _responses.Keys)
             {
                 if (input.Contains(topic))
                 {
+                    // Remember the last topic discussed.
                     _memory.LastTopic = topic;
 
-                    string response = GetRandomResponse(topic);
+                    string response =
+                        GetRandomResponse(topic);
 
-                    // Sentiment-based responses.
+                    // Adjust responses based on the user's mood.
                     if (sentiment == "worried")
                         return "It is understandable to feel worried. " + response;
 
@@ -156,22 +251,24 @@ namespace CyberSecurityAwarenessBotGUIApp.Services
                 }
             }
 
-            // Memory recall.
+            // Allows the chatbot to recall stored user information.
             if (input.Contains("what do you know about me"))
             {
                 return $"Your name is {_memory.UserName} and you are interested in {_memory.FavouriteTopic}.";
             }
 
-            // Default response.
-            return "I can help with passwords, phishing, scams, and privacy.";
+            // Default response if no keyword or command is recognised.
+            return "I can help with passwords, phishing, scams, privacy, malware, ransomware, VPNs, public Wi-Fi safety, social engineering, reminders, tasks and cybersecurity quizzes.";
         }
 
-        // Selects a random response.
+        // Returns a random response for the selected topic.
         private string GetRandomResponse(string topic)
         {
-            List<string> topicResponses = _responses[topic];
+            List<string> topicResponses =
+                _responses[topic];
 
-            int index = _random.Next(topicResponses.Count);
+            int index =
+                _random.Next(topicResponses.Count);
 
             return topicResponses[index];
         }
